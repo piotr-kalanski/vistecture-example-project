@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cloud Team Warsaw application architecture documentation</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<style>
+    h1, h2 {
+        font-weight: 300;
+    }
+    h2,h3,h4,h5 {
+        color:#000;
+    }
+    div.svg-container {
+        background-color:white;
+        padding:4px;
+        overflow:hidden;
+        border:1px solid black;
+        box-sizing: border-box;
+        text-align:center;
+        margin-left:20px;
+        margin-right:20px;
+    }
+
+    svg {max-width: 100%;}
+    table a:link,
+    table a:visited {
+    	color: #333;
+    	font-weight: bold;
+    	text-decoration:none;
+    }
+
+    table a:active,
+    table a:hover {
+    	color: #bd5a35;
+    	text-decoration:underline;
+    }
+    table {
+    	font-family:Arial, Helvetica, sans-serif;
+    	color:#111;
+    	border:0 none;
+        width:100%;
+        box-sizing: border-box;
+    }
+    table > tbody > tr > th {
+    	padding:15px 25px 5px 25px;
+        font-size:110%;
+    	background: #ededed;
+        color:#000;
+
+    }
+    table > tbody > tr > th:first-child {
+    	text-align: left;
+    	padding-left:20px;
+    }
+
+    table tr {
+    	text-align: center;
+    	padding-left:20px;
+    }
+    table td:first-child {
+    	text-align: left;
+    	padding-left:20px;
+    	border-left: 0;
+        vertical-align: top;
+    }
+    table td {
+    	padding:5px;
+    	background: #fafafa;
+        font-size:0.9rem;
+
+    }
+    table tr:nth-child(even) td {
+    	background: #f3f3f3;
+
+    }
+    table tr:last-child td {
+    	border-bottom:0;
+    }
+
+    body > nav {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 0;
+        background: #f2f2f2;
+        padding:16px;
+        padding-left:0;
+        overflow:auto;
+        overflow-y:scroll;
+
+    }
+
+    body > nav ul {
+        list-style: none;
+        margin:0;
+        padding:0;
+        margin-left:16px;
+    }
+
+    body > nav ul li {
+        display:inline-block;
+        width:100%;
+        padding-bottom:8px;
+    }
+
+    body > nav ul li a {
+        color:#bd5a35;
+        text-decoration:none;
+    }
+
+    body > nav ul li a:hover {
+        text-decoration: underline;
+    }
+
+    body > section {
+        min-height: 100%;
+        position: relative;
+        bottom: 100%;
+        top:0;
+        left: 0;
+        z-index: 1;
+        background-color: #fff;
+        color: #222;
+        padding-top:70px;
+    }
+    body > section > h2 {
+        margin-left:20px;
+        margin-right:20px;
+    }
+
+    body > section > header {
+        height:30px;
+        padding:20px;
+        background-color:#4a6580;
+        color:#fff;
+        position:fixed;
+        width:100%;
+        top:0;
+    }
+    body > section > header > h1 {
+        margin:0;
+        padding:0;
+        padding-left:35px;
+        line-height:30px;
+    }
+
+    body > section > section {
+       padding:20px;
+    }
+
+    body > section > section:nth-child(even) {
+        background-color:#fafaff;
+    }
+    .nav-trigger {
+        position: fixed;
+        clip: rect(0, 0, 0, 0);
+    }
+    label[for="nav-trigger"] {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 2;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' x='0px' y='0px' width='30px' height='30px' viewBox='0 0 30 30' enable-background='new 0 0 30 30' xml:space='preserve'><rect width='30' height='6' style='fill:rgb(255,255,255)'/><rect y='24' width='30' height='6' style='fill:rgb(255,255,255)'/><rect y='12' width='30' height='6' style='fill:rgb(255,255,255)'/></svg>");
+        background-size: contain;
+    }
+    .nav-trigger:checked + label {
+        left: 215px;
+    }
+
+    .nav-trigger:checked ~ section {
+        margin-left: 200px;
+        box-shadow: 0 0 5px 5px rgba(0,0,0,0.5);
+    }
+    .nav-trigger + label {
+        transition: left 0.2s;
+    }
+    body > section {
+        transition: margin 0.2s;
+
+    }
+    body {
+        padding:0;
+        margin:0;
+        font-family: 'Roboto', sans-serif;
+    }
+</style>
+</head>
+<body>
+<nav>
+    <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#details">Applications details</a>
+            <ul>
+                
+                <li><a href="#details-collector-service"></a>
+                </li>
+                
+                <li><a href="#details-tracking-configuration-service"></a>
+                </li>
+                
+                <li><a href="#details-authentication-service"></a>
+                </li>
+                
+                <li><a href="#details-data-portal-frontend"></a>
+                </li>
+                
+                <li><a href="#details-oa-service"></a>
+                </li>
+                
+                <li><a href="#details-tracking-sdk"></a>
+                </li>
+                
+            </ul>
+        </li>
+    </ul>
+</nav>
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger"></label>
+<section>
+    <header>
+        <h1>Cloud Team Warsaw application architecture documentation</h1>
+    </header>
+
+    <h2 id="overview">Overview</h2>
+    <table>
+        <tr><th>name</th><th>provided components</th><tr>
+        
+        <tr>
+            <td><a href="#details-collector-service">collector-service</a><br /><small>Collector Service</small></td>
+            <td>
+                <table>
+                    <tr><th>name</th><th>type</th><tr>
+                    
+                        <tr><td>Log user behavior event</td><td>api</td></tr>
+                    
+                </table>
+            </td>
+        </tr>
+        
+        <tr>
+            <td><a href="#details-tracking-configuration-service">tracking-configuration-service</a><br /><small>Tracking Configuration Service</small></td>
+            <td>
+                <table>
+                    <tr><th>name</th><th>type</th><tr>
+                    
+                        <tr><td>create tracking configuration</td><td>api</td></tr>
+                    
+                        <tr><td>get tracking configuration</td><td>api</td></tr>
+                    
+                </table>
+            </td>
+        </tr>
+        
+        <tr>
+            <td><a href="#details-authentication-service">authentication-service</a><br /><small>Authentication Service for Data Portal responsible for generating JWT token</small></td>
+            <td>
+                <table>
+                    <tr><th>name</th><th>type</th><tr>
+                    
+                        <tr><td>authenticate</td><td>api</td></tr>
+                    
+                </table>
+            </td>
+        </tr>
+        
+        <tr>
+            <td><a href="#details-data-portal-frontend">data-portal-frontend</a><br /><small>Data Portal Frontend</small></td>
+            <td>
+                <table>
+                    <tr><th>name</th><th>type</th><tr>
+                    
+                        <tr><td>Manage Data Ingestion</td><td>ui</td></tr>
+                    
+                </table>
+            </td>
+        </tr>
+        
+        <tr>
+            <td><a href="#details-oa-service">oa-service</a><br /><small>API to authenticate TCL employees with using credentials</small></td>
+            <td>
+                <table>
+                    <tr><th>name</th><th>type</th><tr>
+                    
+                        <tr><td>authenticate</td><td>api</td></tr>
+                    
+                </table>
+            </td>
+        </tr>
+        
+        <tr>
+            <td><a href="#details-tracking-sdk">tracking-sdk</a><br /><small>Tracking SDK installed on applications (Android, iOS, wechat miniprogram, ...)</small></td>
+            <td>
+                <table>
+                    <tr><th>name</th><th>type</th><tr>
+                    
+                        <tr><td>track event</td><td>library</td></tr>
+                    
+                </table>
+            </td>
+        </tr>
+        
+    </table>
+
+
+
+    <h2 id="details">Application Details</h2>
+
+    
+     <section id="details-collector-service">
+       <h3 > (collector-service)</h3>
+       <p><b></b></p>
+       <p> <p>Collector Service</p>
+ </p>
+       <div class="svg-container">
+       <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.44.2~dev.20201112.1525 (20201112.1525)
+ -->
+<!-- Pages: 1 -->
+<svg width="341pt" height="274pt"
+ viewBox="0.00 0.00 341.00 274.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 270)">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-270 337,-270 337,4 -4,4"/>
+<!-- collector&#45;service -->
+<g id="node1" class="node">
+<title>collector&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="62.5,-116 62.5,-167 270.5,-167 270.5,-116 62.5,-116"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="64.5,-134.5 64.5,-164.5 218.5,-164.5 218.5,-134.5 64.5,-134.5"/>
+<text text-anchor="start" x="67.5" y="-145.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">COLLECTOR&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="218.5,-134.5 218.5,-164.5 268.5,-164.5 268.5,-134.5 218.5,-134.5"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="231.453" y="-161.5"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="64.5,-117.5 64.5,-134.5 268.5,-134.5 268.5,-117.5 64.5,-117.5"/>
+<text text-anchor="start" x="110.5" y="-123.5" font-family="Times New Roman,serif" font-size="10.00">api:Log user behavior event</text>
+<polygon fill="black" stroke="black" points="62.5,-134.5 62.5,-134.5 218.5,-134.5 218.5,-134.5 62.5,-134.5"/>
+<polygon fill="black" stroke="black" points="218.5,-134.5 218.5,-134.5 270.5,-134.5 270.5,-134.5 218.5,-134.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="63.5,-117 63.5,-166 269.5,-166 269.5,-117 63.5,-117"/>
+</g>
+<!-- tracking&#45;configuration&#45;service -->
+<g id="node2" class="node">
+<title>tracking&#45;configuration&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="8,-4 8,-72 325,-72 325,-4 8,-4"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="10.5,-40 10.5,-70 273.5,-70 273.5,-40 10.5,-40"/>
+<text text-anchor="start" x="13.5" y="-51.3" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">TRACKING&#45;CONFIGURATION&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="273.5,-40 273.5,-70 323.5,-70 323.5,-40 273.5,-40"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="286.453" y="-67"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="10.5,-23 10.5,-40 323.5,-40 323.5,-23 10.5,-23"/>
+<text text-anchor="start" x="102" y="-29" font-family="Times New Roman,serif" font-size="10.00">api:create tracking configuration</text>
+<polygon fill="#a3c7d4" stroke="transparent" points="10.5,-6 10.5,-23 323.5,-23 323.5,-6 10.5,-6"/>
+<text text-anchor="start" x="108" y="-12" font-family="Times New Roman,serif" font-size="10.00">api:get tracking configuration</text>
+<polygon fill="black" stroke="black" points="8.5,-40 8.5,-40 273.5,-40 273.5,-40 8.5,-40"/>
+<polygon fill="black" stroke="black" points="273.5,-40 273.5,-40 325.5,-40 325.5,-40 273.5,-40"/>
+<polygon fill="black" stroke="black" points="8.5,-23 8.5,-23 325.5,-23 325.5,-23 8.5,-23"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="9,-5 9,-71 324,-71 324,-5 9,-5"/>
+</g>
+<!-- collector&#45;service&#45;&gt;tracking&#45;configuration&#45;service -->
+<g id="edge1" class="edge">
+<title>collector&#45;service:&#45;&gt;tracking&#45;configuration&#45;service:</title>
+<path fill="none" stroke="#333333" d="M166.5,-111.96C166.5,-103.95 166.5,-95.02 166.5,-86.24"/>
+<polygon fill="#333333" stroke="#333333" points="170,-86.05 166.5,-76.05 163,-86.05 170,-86.05"/>
+</g>
+<!-- tracking&#45;sdk -->
+<g id="node3" class="node">
+<title>tracking&#45;sdk</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="8.5,-211 8.5,-262 174.5,-262 174.5,-211 8.5,-211"/>
+<polygon fill="#8e0909" stroke="transparent" points="10.5,-229.5 10.5,-259.5 122.5,-259.5 122.5,-229.5 10.5,-229.5"/>
+<text text-anchor="start" x="13.5" y="-240.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">TRACKING&#45;SDK</text>
+<polygon fill="#8e0909" stroke="transparent" points="122.5,-229.5 122.5,-259.5 172.5,-259.5 172.5,-229.5 122.5,-229.5"/>
+<polygon fill="#cfcfcf" stroke="transparent" points="10.5,-212.5 10.5,-229.5 172.5,-229.5 172.5,-212.5 10.5,-212.5"/>
+<text text-anchor="start" x="55" y="-218.5" font-family="Times New Roman,serif" font-size="10.00">library:track event</text>
+<polygon fill="black" stroke="black" points="8.5,-229.5 8.5,-229.5 122.5,-229.5 122.5,-229.5 8.5,-229.5"/>
+<polygon fill="black" stroke="black" points="122.5,-229.5 122.5,-229.5 174.5,-229.5 174.5,-229.5 122.5,-229.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="9.5,-212 9.5,-261 173.5,-261 173.5,-212 9.5,-212"/>
+</g>
+<!-- tracking&#45;sdk&#45;&gt;collector&#45;service -->
+<g id="edge2" class="edge">
+<title>tracking&#45;sdk:&#45;&gt;collector&#45;service:</title>
+<path fill="none" stroke="#333333" d="M114.61,-206.84C121.67,-198.09 129.53,-188.34 136.95,-179.14"/>
+<polygon fill="#333333" stroke="#333333" points="139.78,-181.21 143.33,-171.23 134.33,-176.81 139.78,-181.21"/>
+</g>
+<!-- DynamoDB -->
+<g id="node4" class="node">
+<title>DynamoDB</title>
+<polygon fill="none" stroke="#576f96" points="284,-254.5 201,-254.5 201,-218.5 284,-218.5 284,-254.5"/>
+<text text-anchor="middle" x="242.5" y="-232.8" font-family="Times New Roman,serif" font-size="14.00">DynamoDB</text>
+</g>
+<!-- DynamoDB&#45;&gt;collector&#45;service -->
+<g id="edge3" class="edge">
+<title>DynamoDB:&#45;&gt;collector&#45;service:</title>
+<path fill="none" stroke="#576f96" d="M228.56,-218.44C217.76,-205.23 202.56,-186.62 189.9,-171.14"/>
+</g>
+</g>
+</svg>
+
+       </div>
+        <h4 id="details-collector-service-properties">Properties</h4>
+        <table>
+        
+           <tr><td>deployment</td><td>aws</td></tr>
+        
+        </table>
+
+        <h4 id="details-collector-service-services">Components provided</h4>
+              <p>The application provides the following service components:</p>
+              <ul>
+                  
+                       <li>
+                        <b>Log user behavior event </b>
+                        <br> 
+                       </li>
+                  
+              </ul>
+       <h4 id="details-collector-service-dependencies">dependencies</h4>
+       <p>The application requires the following services:</p>
+       <ul>
+           
+           
+                <li>tracking-configuration-service</li>
+           
+       </ul>
+        <p>The application requires the following infrastructure services:</p>
+              <ul>
+                  
+                       <li>DynamoDB-collector-service</li>
+                  
+              </ul>
+
+     </section>
+    
+     <section id="details-tracking-configuration-service">
+       <h3 > (tracking-configuration-service)</h3>
+       <p><b></b></p>
+       <p> <p>Tracking Configuration Service</p>
+ </p>
+       <div class="svg-container">
+       <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.44.2~dev.20201112.1525 (20201112.1525)
+ -->
+<!-- Pages: 1 -->
+<svg width="806pt" height="179pt"
+ viewBox="0.00 0.00 805.50 179.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 175)">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-175 801.5,-175 801.5,4 -4,4"/>
+<!-- tracking&#45;configuration&#45;service -->
+<g id="node1" class="node">
+<title>tracking&#45;configuration&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="328.5,-4 328.5,-72 645.5,-72 645.5,-4 328.5,-4"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="331,-40 331,-70 594,-70 594,-40 331,-40"/>
+<text text-anchor="start" x="334" y="-51.3" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">TRACKING&#45;CONFIGURATION&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="594,-40 594,-70 644,-70 644,-40 594,-40"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="606.953" y="-67"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="331,-23 331,-40 644,-40 644,-23 331,-23"/>
+<text text-anchor="start" x="422.5" y="-29" font-family="Times New Roman,serif" font-size="10.00">api:create tracking configuration</text>
+<polygon fill="#a3c7d4" stroke="transparent" points="331,-6 331,-23 644,-23 644,-6 331,-6"/>
+<text text-anchor="start" x="428.5" y="-12" font-family="Times New Roman,serif" font-size="10.00">api:get tracking configuration</text>
+<polygon fill="black" stroke="black" points="329,-40 329,-40 594,-40 594,-40 329,-40"/>
+<polygon fill="black" stroke="black" points="594,-40 594,-40 646,-40 646,-40 594,-40"/>
+<polygon fill="black" stroke="black" points="329,-23 329,-23 646,-23 646,-23 329,-23"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="329.5,-5 329.5,-71 644.5,-71 644.5,-5 329.5,-5"/>
+</g>
+<!-- collector&#45;service -->
+<g id="node2" class="node">
+<title>collector&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="8,-116 8,-167 216,-167 216,-116 8,-116"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="10,-134.5 10,-164.5 164,-164.5 164,-134.5 10,-134.5"/>
+<text text-anchor="start" x="13" y="-145.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">COLLECTOR&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="164,-134.5 164,-164.5 214,-164.5 214,-134.5 164,-134.5"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="176.953" y="-161.5"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="10,-117.5 10,-134.5 214,-134.5 214,-117.5 10,-117.5"/>
+<text text-anchor="start" x="56" y="-123.5" font-family="Times New Roman,serif" font-size="10.00">api:Log user behavior event</text>
+<polygon fill="black" stroke="black" points="8,-134.5 8,-134.5 164,-134.5 164,-134.5 8,-134.5"/>
+<polygon fill="black" stroke="black" points="164,-134.5 164,-134.5 216,-134.5 216,-134.5 164,-134.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="9,-117 9,-166 215,-166 215,-117 9,-117"/>
+</g>
+<!-- collector&#45;service&#45;&gt;tracking&#45;configuration&#45;service -->
+<g id="edge1" class="edge">
+<title>collector&#45;service:&#45;&gt;tracking&#45;configuration&#45;service:</title>
+<path fill="none" stroke="#333333" d="M217.46,-111.96C255.56,-101.64 299.3,-89.8 340.3,-78.71"/>
+<polygon fill="#333333" stroke="#333333" points="341.37,-82.04 350.1,-76.05 339.54,-75.29 341.37,-82.04"/>
+</g>
+<!-- data&#45;portal&#45;frontend -->
+<g id="node3" class="node">
+<title>data&#45;portal&#45;frontend</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="250,-116 250,-167 488,-167 488,-116 250,-116"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="252,-134.5 252,-164.5 436,-164.5 436,-134.5 252,-134.5"/>
+<text text-anchor="start" x="255" y="-145.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">DATA&#45;PORTAL&#45;FRONTEND</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="436,-134.5 436,-164.5 486,-164.5 486,-134.5 436,-134.5"/>
+<image xlink:href="templates/icons/react.png" width="26.7188px" height="24px" preserveAspectRatio="xMinYMin meet" x="447.641" y="-161.5"/>
+<polygon fill="#cfcfcf" stroke="transparent" points="252,-117.5 252,-134.5 486,-134.5 486,-117.5 252,-117.5"/>
+<text text-anchor="start" x="316.5" y="-123.5" font-family="Times New Roman,serif" font-size="10.00">ui:Manage Data Ingestion</text>
+<polygon fill="black" stroke="black" points="250,-134.5 250,-134.5 436,-134.5 436,-134.5 250,-134.5"/>
+<polygon fill="black" stroke="black" points="436,-134.5 436,-134.5 488,-134.5 488,-134.5 436,-134.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="251,-117 251,-166 487,-166 487,-117 251,-117"/>
+</g>
+<!-- data&#45;portal&#45;frontend&#45;&gt;tracking&#45;configuration&#45;service -->
+<g id="edge2" class="edge">
+<title>data&#45;portal&#45;frontend:&#45;&gt;tracking&#45;configuration&#45;service:</title>
+<path fill="none" stroke="#333333" d="M402.18,-111.96C412.71,-102.9 424.6,-92.68 436.07,-82.81"/>
+<polygon fill="#333333" stroke="#333333" points="438.62,-85.23 443.92,-76.05 434.06,-79.92 438.62,-85.23"/>
+</g>
+<!-- tracking&#45;sdk -->
+<g id="node4" class="node">
+<title>tracking&#45;sdk</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="522,-116 522,-167 688,-167 688,-116 522,-116"/>
+<polygon fill="#8e0909" stroke="transparent" points="524,-134.5 524,-164.5 636,-164.5 636,-134.5 524,-134.5"/>
+<text text-anchor="start" x="527" y="-145.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">TRACKING&#45;SDK</text>
+<polygon fill="#8e0909" stroke="transparent" points="636,-134.5 636,-164.5 686,-164.5 686,-134.5 636,-134.5"/>
+<polygon fill="#cfcfcf" stroke="transparent" points="524,-117.5 524,-134.5 686,-134.5 686,-117.5 524,-117.5"/>
+<text text-anchor="start" x="568.5" y="-123.5" font-family="Times New Roman,serif" font-size="10.00">library:track event</text>
+<polygon fill="black" stroke="black" points="522,-134.5 522,-134.5 636,-134.5 636,-134.5 522,-134.5"/>
+<polygon fill="black" stroke="black" points="636,-134.5 636,-134.5 688,-134.5 688,-134.5 636,-134.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="523,-117 523,-166 687,-166 687,-117 523,-117"/>
+</g>
+<!-- tracking&#45;sdk&#45;&gt;tracking&#45;configuration&#45;service -->
+<g id="edge3" class="edge">
+<title>tracking&#45;sdk:&#45;&gt;tracking&#45;configuration&#45;service:</title>
+<path fill="none" stroke="#333333" d="M571.82,-111.96C561.29,-102.9 549.4,-92.68 537.93,-82.81"/>
+<polygon fill="#333333" stroke="#333333" points="539.94,-79.92 530.08,-76.05 535.38,-85.23 539.94,-79.92"/>
+</g>
+<!-- DynamoDB -->
+<g id="node5" class="node">
+<title>DynamoDB</title>
+<polygon fill="none" stroke="#576f96" points="797.5,-159.5 714.5,-159.5 714.5,-123.5 797.5,-123.5 797.5,-159.5"/>
+<text text-anchor="middle" x="756" y="-137.8" font-family="Times New Roman,serif" font-size="14.00">DynamoDB</text>
+</g>
+<!-- DynamoDB&#45;&gt;tracking&#45;configuration&#45;service -->
+<g id="edge4" class="edge">
+<title>DynamoDB:&#45;&gt;tracking&#45;configuration&#45;service:</title>
+<path fill="none" stroke="#576f96" d="M727.62,-123.41C720.38,-119.4 712.51,-115.32 705,-112 675.16,-98.8 642.15,-86.59 611.03,-76.08"/>
+</g>
+</g>
+</svg>
+
+       </div>
+        <h4 id="details-tracking-configuration-service-properties">Properties</h4>
+        <table>
+        
+           <tr><td>deployment</td><td>aws</td></tr>
+        
+        </table>
+
+        <h4 id="details-tracking-configuration-service-services">Components provided</h4>
+              <p>The application provides the following service components:</p>
+              <ul>
+                  
+                       <li>
+                        <b>create tracking configuration </b>
+                        <br> 
+                       </li>
+                  
+                       <li>
+                        <b>get tracking configuration </b>
+                        <br> 
+                       </li>
+                  
+              </ul>
+       <h4 id="details-tracking-configuration-service-dependencies">dependencies</h4>
+       <p>The application requires the following services:</p>
+       <ul>
+           
+           
+       </ul>
+        <p>The application requires the following infrastructure services:</p>
+              <ul>
+                  
+                       <li>DynamoDB-tracking-configuration-service</li>
+                  
+              </ul>
+
+     </section>
+    
+     <section id="details-authentication-service">
+       <h3 > (authentication-service)</h3>
+       <p><b></b></p>
+       <p> <p>Authentication Service for Data Portal responsible for generating JWT token</p>
+ </p>
+       <div class="svg-container">
+       <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.44.2~dev.20201112.1525 (20201112.1525)
+ -->
+<!-- Pages: 1 -->
+<svg width="524pt" height="257pt"
+ viewBox="0.00 0.00 524.00 257.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 253)">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-253 520,-253 520,4 -4,4"/>
+<!-- authentication&#45;service -->
+<g id="node1" class="node">
+<title>authentication&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="212.5,-99 212.5,-150 459.5,-150 459.5,-99 212.5,-99"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="215,-117.5 215,-147.5 408,-147.5 408,-117.5 215,-117.5"/>
+<text text-anchor="start" x="218" y="-128.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">AUTHENTICATION&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="408,-117.5 408,-147.5 458,-147.5 458,-117.5 408,-117.5"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="420.953" y="-144.5"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="215,-100.5 215,-117.5 458,-117.5 458,-100.5 215,-100.5"/>
+<text text-anchor="start" x="304.5" y="-106.5" font-family="Times New Roman,serif" font-size="10.00">api:authenticate</text>
+<polygon fill="black" stroke="black" points="213,-117.5 213,-117.5 408,-117.5 408,-117.5 213,-117.5"/>
+<polygon fill="black" stroke="black" points="408,-117.5 408,-117.5 460,-117.5 460,-117.5 408,-117.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="213.5,-100 213.5,-149 458.5,-149 458.5,-100 213.5,-100"/>
+</g>
+<!-- oa&#45;service -->
+<g id="node2" class="node">
+<title>oa&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="264,-4 264,-55 408,-55 408,-4 264,-4"/>
+<polygon fill="#8e0909" stroke="transparent" points="266,-22.5 266,-52.5 356,-52.5 356,-22.5 266,-22.5"/>
+<text text-anchor="start" x="269" y="-33.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">OA&#45;SERVICE</text>
+<polygon fill="#8e0909" stroke="transparent" points="356,-22.5 356,-52.5 406,-52.5 406,-22.5 356,-22.5"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="266,-5.5 266,-22.5 406,-22.5 406,-5.5 266,-5.5"/>
+<text text-anchor="start" x="304" y="-11.5" font-family="Times New Roman,serif" font-size="10.00">api:authenticate</text>
+<polygon fill="black" stroke="black" points="264,-22.5 264,-22.5 356,-22.5 356,-22.5 264,-22.5"/>
+<polygon fill="black" stroke="black" points="356,-22.5 356,-22.5 408,-22.5 408,-22.5 356,-22.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="265,-5 265,-54 407,-54 407,-5 265,-5"/>
+</g>
+<!-- authentication&#45;service&#45;&gt;oa&#45;service -->
+<g id="edge1" class="edge">
+<title>authentication&#45;service:&#45;&gt;oa&#45;service:</title>
+<path fill="none" stroke="#333333" d="M336,-94.84C336,-86.79 336,-77.91 336,-69.38"/>
+<polygon fill="#333333" stroke="#333333" points="339.5,-69.23 336,-59.23 332.5,-69.23 339.5,-69.23"/>
+</g>
+<!-- data&#45;portal&#45;frontend -->
+<g id="node3" class="node">
+<title>data&#45;portal&#45;frontend</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="8,-194 8,-245 246,-245 246,-194 8,-194"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="10,-212.5 10,-242.5 194,-242.5 194,-212.5 10,-212.5"/>
+<text text-anchor="start" x="13" y="-223.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">DATA&#45;PORTAL&#45;FRONTEND</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="194,-212.5 194,-242.5 244,-242.5 244,-212.5 194,-212.5"/>
+<image xlink:href="templates/icons/react.png" width="26.7188px" height="24px" preserveAspectRatio="xMinYMin meet" x="205.641" y="-239.5"/>
+<polygon fill="#cfcfcf" stroke="transparent" points="10,-195.5 10,-212.5 244,-212.5 244,-195.5 10,-195.5"/>
+<text text-anchor="start" x="74.5" y="-201.5" font-family="Times New Roman,serif" font-size="10.00">ui:Manage Data Ingestion</text>
+<polygon fill="black" stroke="black" points="8,-212.5 8,-212.5 194,-212.5 194,-212.5 8,-212.5"/>
+<polygon fill="black" stroke="black" points="194,-212.5 194,-212.5 246,-212.5 246,-212.5 194,-212.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="9,-195 9,-244 245,-244 245,-195 9,-195"/>
+</g>
+<!-- data&#45;portal&#45;frontend&#45;&gt;authentication&#45;service -->
+<g id="edge2" class="edge">
+<title>data&#45;portal&#45;frontend:&#45;&gt;authentication&#45;service:</title>
+<path fill="none" stroke="#333333" d="M191.13,-189.96C213.69,-179.92 239.22,-168.56 262.5,-158.21"/>
+<polygon fill="#333333" stroke="#333333" points="263.92,-161.4 271.63,-154.14 261.07,-155.01 263.92,-161.4"/>
+</g>
+<!-- AWS API Gateway -->
+<g id="node4" class="node">
+<title>AWS API Gateway</title>
+<polygon fill="none" stroke="#576f96" points="399.5,-237.5 272.5,-237.5 272.5,-201.5 399.5,-201.5 399.5,-237.5"/>
+<text text-anchor="middle" x="336" y="-215.8" font-family="Times New Roman,serif" font-size="14.00">AWS API Gateway</text>
+</g>
+<!-- AWS API Gateway&#45;&gt;authentication&#45;service -->
+<g id="edge3" class="edge">
+<title>AWS API Gateway:&#45;&gt;authentication&#45;service:</title>
+<path fill="none" stroke="#576f96" d="M336,-201.44C336,-188.23 336,-169.62 336,-154.14"/>
+</g>
+<!-- AWS Lambda -->
+<g id="node5" class="node">
+<title>AWS Lambda</title>
+<polygon fill="none" stroke="#576f96" points="516,-237.5 418,-237.5 418,-201.5 516,-201.5 516,-237.5"/>
+<text text-anchor="middle" x="467" y="-215.8" font-family="Times New Roman,serif" font-size="14.00">AWS Lambda</text>
+</g>
+<!-- AWS Lambda&#45;&gt;authentication&#45;service -->
+<g id="edge4" class="edge">
+<title>AWS Lambda:&#45;&gt;authentication&#45;service:</title>
+<path fill="none" stroke="#576f96" d="M442.97,-201.44C424.36,-188.23 398.15,-169.62 376.34,-154.14"/>
+</g>
+</g>
+</svg>
+
+       </div>
+        <h4 id="details-authentication-service-properties">Properties</h4>
+        <table>
+        
+           <tr><td>category</td><td>REST API</td></tr>
+        
+           <tr><td>deployment</td><td>AWS</td></tr>
+        
+           <tr><td>gitlab-url</td><td>https://gitlab.com/abc2</td></tr>
+        
+        </table>
+
+        <h4 id="details-authentication-service-services">Components provided</h4>
+              <p>The application provides the following service components:</p>
+              <ul>
+                  
+                       <li>
+                        <b>authenticate </b>
+                        <br> 
+                       </li>
+                  
+              </ul>
+       <h4 id="details-authentication-service-dependencies">dependencies</h4>
+       <p>The application requires the following services:</p>
+       <ul>
+           
+           
+                <li>oa-service</li>
+           
+       </ul>
+        <p>The application requires the following infrastructure services:</p>
+              <ul>
+                  
+                       <li>AWS API Gateway-authentication-service</li>
+                  
+                       <li>AWS Lambda-authentication-service</li>
+                  
+              </ul>
+
+     </section>
+    
+     <section id="details-data-portal-frontend">
+       <h3 > (data-portal-frontend)</h3>
+       <p><b></b></p>
+       <p> <p>Data Portal Frontend</p>
+ </p>
+       <div class="svg-container">
+       <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.44.2~dev.20201112.1525 (20201112.1525)
+ -->
+<!-- Pages: 1 -->
+<svg width="622pt" height="251pt"
+ viewBox="0.00 0.00 622.00 251.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 247)">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-247 618,-247 618,4 -4,4"/>
+<!-- data&#45;portal&#45;frontend -->
+<g id="node1" class="node">
+<title>data&#45;portal&#45;frontend</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="205.5,-116 205.5,-167 443.5,-167 443.5,-116 205.5,-116"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="207.5,-134.5 207.5,-164.5 391.5,-164.5 391.5,-134.5 207.5,-134.5"/>
+<text text-anchor="start" x="210.5" y="-145.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">DATA&#45;PORTAL&#45;FRONTEND</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="391.5,-134.5 391.5,-164.5 441.5,-164.5 441.5,-134.5 391.5,-134.5"/>
+<image xlink:href="templates/icons/react.png" width="26.7188px" height="24px" preserveAspectRatio="xMinYMin meet" x="403.141" y="-161.5"/>
+<polygon fill="#cfcfcf" stroke="transparent" points="207.5,-117.5 207.5,-134.5 441.5,-134.5 441.5,-117.5 207.5,-117.5"/>
+<text text-anchor="start" x="272" y="-123.5" font-family="Times New Roman,serif" font-size="10.00">ui:Manage Data Ingestion</text>
+<polygon fill="black" stroke="black" points="205.5,-134.5 205.5,-134.5 391.5,-134.5 391.5,-134.5 205.5,-134.5"/>
+<polygon fill="black" stroke="black" points="391.5,-134.5 391.5,-134.5 443.5,-134.5 443.5,-134.5 391.5,-134.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="206.5,-117 206.5,-166 442.5,-166 442.5,-117 206.5,-117"/>
+</g>
+<!-- tracking&#45;configuration&#45;service -->
+<g id="node2" class="node">
+<title>tracking&#45;configuration&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="8,-4 8,-72 325,-72 325,-4 8,-4"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="10.5,-40 10.5,-70 273.5,-70 273.5,-40 10.5,-40"/>
+<text text-anchor="start" x="13.5" y="-51.3" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">TRACKING&#45;CONFIGURATION&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="273.5,-40 273.5,-70 323.5,-70 323.5,-40 273.5,-40"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="286.453" y="-67"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="10.5,-23 10.5,-40 323.5,-40 323.5,-23 10.5,-23"/>
+<text text-anchor="start" x="102" y="-29" font-family="Times New Roman,serif" font-size="10.00">api:create tracking configuration</text>
+<polygon fill="#a3c7d4" stroke="transparent" points="10.5,-6 10.5,-23 323.5,-23 323.5,-6 10.5,-6"/>
+<text text-anchor="start" x="108" y="-12" font-family="Times New Roman,serif" font-size="10.00">api:get tracking configuration</text>
+<polygon fill="black" stroke="black" points="8.5,-40 8.5,-40 273.5,-40 273.5,-40 8.5,-40"/>
+<polygon fill="black" stroke="black" points="273.5,-40 273.5,-40 325.5,-40 325.5,-40 273.5,-40"/>
+<polygon fill="black" stroke="black" points="8.5,-23 8.5,-23 325.5,-23 325.5,-23 8.5,-23"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="9,-5 9,-71 324,-71 324,-5 9,-5"/>
+</g>
+<!-- data&#45;portal&#45;frontend&#45;&gt;tracking&#45;configuration&#45;service -->
+<g id="edge1" class="edge">
+<title>data&#45;portal&#45;frontend:&#45;&gt;tracking&#45;configuration&#45;service:</title>
+<path fill="none" stroke="#333333" d="M280.07,-111.96C265.44,-102.56 248.83,-91.89 232.93,-81.67"/>
+<polygon fill="#333333" stroke="#333333" points="234.48,-78.51 224.18,-76.05 230.7,-84.4 234.48,-78.51"/>
+</g>
+<!-- authentication&#45;service -->
+<g id="node3" class="node">
+<title>authentication&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="359,-12.5 359,-63.5 606,-63.5 606,-12.5 359,-12.5"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="361.5,-31 361.5,-61 554.5,-61 554.5,-31 361.5,-31"/>
+<text text-anchor="start" x="364.5" y="-42.3" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">AUTHENTICATION&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="554.5,-31 554.5,-61 604.5,-61 604.5,-31 554.5,-31"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="567.453" y="-58"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="361.5,-14 361.5,-31 604.5,-31 604.5,-14 361.5,-14"/>
+<text text-anchor="start" x="451" y="-20" font-family="Times New Roman,serif" font-size="10.00">api:authenticate</text>
+<polygon fill="black" stroke="black" points="359.5,-31 359.5,-31 554.5,-31 554.5,-31 359.5,-31"/>
+<polygon fill="black" stroke="black" points="554.5,-31 554.5,-31 606.5,-31 606.5,-31 554.5,-31"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="360,-13.5 360,-62.5 605,-62.5 605,-13.5 360,-13.5"/>
+</g>
+<!-- data&#45;portal&#45;frontend&#45;&gt;authentication&#45;service -->
+<g id="edge2" class="edge">
+<title>data&#45;portal&#45;frontend:&#45;&gt;authentication&#45;service:</title>
+<path fill="none" stroke="#333333" d="M368.93,-111.96C387.78,-99.85 409.89,-85.65 429.57,-73"/>
+<polygon fill="#333333" stroke="#333333" points="431.61,-75.85 438.13,-67.5 427.82,-69.97 431.61,-75.85"/>
+</g>
+<!-- S3 -->
+<g id="node4" class="node">
+<title>S3</title>
+<polygon fill="none" stroke="#576f96" points="351.5,-243 297.5,-243 297.5,-207 351.5,-207 351.5,-243"/>
+<text text-anchor="middle" x="324.5" y="-221.3" font-family="Times New Roman,serif" font-size="14.00">S3</text>
+</g>
+<!-- S3&#45;&gt;data&#45;portal&#45;frontend -->
+<g id="edge3" class="edge">
+<title>S3:&#45;&gt;data&#45;portal&#45;frontend:</title>
+<path fill="none" stroke="#576f96" d="M324.5,-206.72C324.5,-196.44 324.5,-183.13 324.5,-171.31"/>
+</g>
+</g>
+</svg>
+
+       </div>
+        <h4 id="details-data-portal-frontend-properties">Properties</h4>
+        <table>
+        
+           <tr><td>deployment</td><td>aws</td></tr>
+        
+           <tr><td>gitlab-url</td><td>https://gitlab.com/blablabla</td></tr>
+        
+        </table>
+
+        <h4 id="details-data-portal-frontend-services">Components provided</h4>
+              <p>The application provides the following service components:</p>
+              <ul>
+                  
+                       <li>
+                        <b>Manage Data Ingestion </b>
+                        <br> 
+                       </li>
+                  
+              </ul>
+       <h4 id="details-data-portal-frontend-dependencies">dependencies</h4>
+       <p>The application requires the following services:</p>
+       <ul>
+           
+           
+                <li>tracking-configuration-service</li>
+           
+                <li>authentication-service</li>
+           
+       </ul>
+        <p>The application requires the following infrastructure services:</p>
+              <ul>
+                  
+                       <li>S3-data-portal-frontend</li>
+                  
+              </ul>
+
+     </section>
+    
+     <section id="details-oa-service">
+       <h3 > (oa-service)</h3>
+       <p><b></b></p>
+       <p> <p>API to authenticate TCL employees with using credentials</p>
+ </p>
+       <div class="svg-container">
+       <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.44.2~dev.20201112.1525 (20201112.1525)
+ -->
+<!-- Pages: 1 -->
+<svg width="271pt" height="162pt"
+ viewBox="0.00 0.00 271.00 162.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 158)">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-158 267,-158 267,4 -4,4"/>
+<!-- oa&#45;service -->
+<g id="node1" class="node">
+<title>oa&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="59.5,-4 59.5,-55 203.5,-55 203.5,-4 59.5,-4"/>
+<polygon fill="#8e0909" stroke="transparent" points="61.5,-22.5 61.5,-52.5 151.5,-52.5 151.5,-22.5 61.5,-22.5"/>
+<text text-anchor="start" x="64.5" y="-33.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">OA&#45;SERVICE</text>
+<polygon fill="#8e0909" stroke="transparent" points="151.5,-22.5 151.5,-52.5 201.5,-52.5 201.5,-22.5 151.5,-22.5"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="61.5,-5.5 61.5,-22.5 201.5,-22.5 201.5,-5.5 61.5,-5.5"/>
+<text text-anchor="start" x="99.5" y="-11.5" font-family="Times New Roman,serif" font-size="10.00">api:authenticate</text>
+<polygon fill="black" stroke="black" points="59.5,-22.5 59.5,-22.5 151.5,-22.5 151.5,-22.5 59.5,-22.5"/>
+<polygon fill="black" stroke="black" points="151.5,-22.5 151.5,-22.5 203.5,-22.5 203.5,-22.5 151.5,-22.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="60.5,-5 60.5,-54 202.5,-54 202.5,-5 60.5,-5"/>
+</g>
+<!-- authentication&#45;service -->
+<g id="node2" class="node">
+<title>authentication&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="8,-99 8,-150 255,-150 255,-99 8,-99"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="10.5,-117.5 10.5,-147.5 203.5,-147.5 203.5,-117.5 10.5,-117.5"/>
+<text text-anchor="start" x="13.5" y="-128.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">AUTHENTICATION&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="203.5,-117.5 203.5,-147.5 253.5,-147.5 253.5,-117.5 203.5,-117.5"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="216.453" y="-144.5"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="10.5,-100.5 10.5,-117.5 253.5,-117.5 253.5,-100.5 10.5,-100.5"/>
+<text text-anchor="start" x="100" y="-106.5" font-family="Times New Roman,serif" font-size="10.00">api:authenticate</text>
+<polygon fill="black" stroke="black" points="8.5,-117.5 8.5,-117.5 203.5,-117.5 203.5,-117.5 8.5,-117.5"/>
+<polygon fill="black" stroke="black" points="203.5,-117.5 203.5,-117.5 255.5,-117.5 255.5,-117.5 203.5,-117.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="9,-100 9,-149 254,-149 254,-100 9,-100"/>
+</g>
+<!-- authentication&#45;service&#45;&gt;oa&#45;service -->
+<g id="edge1" class="edge">
+<title>authentication&#45;service:&#45;&gt;oa&#45;service:</title>
+<path fill="none" stroke="#333333" d="M131.5,-94.84C131.5,-86.79 131.5,-77.91 131.5,-69.38"/>
+<polygon fill="#333333" stroke="#333333" points="135,-69.23 131.5,-59.23 128,-69.23 135,-69.23"/>
+</g>
+</g>
+</svg>
+
+       </div>
+        <h4 id="details-oa-service-properties">Properties</h4>
+        <table>
+        
+        </table>
+
+        <h4 id="details-oa-service-services">Components provided</h4>
+              <p>The application provides the following service components:</p>
+              <ul>
+                  
+                       <li>
+                        <b>authenticate </b>
+                        <br> 
+                       </li>
+                  
+              </ul>
+       <h4 id="details-oa-service-dependencies">dependencies</h4>
+       <p>The application requires the following services:</p>
+       <ul>
+           
+           
+       </ul>
+        <p>The application requires the following infrastructure services:</p>
+              <ul>
+                  
+              </ul>
+
+     </section>
+    
+     <section id="details-tracking-sdk">
+       <h3 > (tracking-sdk)</h3>
+       <p><b></b></p>
+       <p> <p>Tracking SDK installed on applications (Android, iOS, wechat miniprogram, &hellip;)</p>
+ </p>
+       <div class="svg-container">
+       <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.44.2~dev.20201112.1525 (20201112.1525)
+ -->
+<!-- Pages: 1 -->
+<svg width="584pt" height="179pt"
+ viewBox="0.00 0.00 583.50 179.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 175)">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-175 579.5,-175 579.5,4 -4,4"/>
+<!-- tracking&#45;sdk -->
+<g id="node1" class="node">
+<title>tracking&#45;sdk</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="177,-116 177,-167 343,-167 343,-116 177,-116"/>
+<polygon fill="#8e0909" stroke="transparent" points="179,-134.5 179,-164.5 291,-164.5 291,-134.5 179,-134.5"/>
+<text text-anchor="start" x="182" y="-145.8" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">TRACKING&#45;SDK</text>
+<polygon fill="#8e0909" stroke="transparent" points="291,-134.5 291,-164.5 341,-164.5 341,-134.5 291,-134.5"/>
+<polygon fill="#cfcfcf" stroke="transparent" points="179,-117.5 179,-134.5 341,-134.5 341,-117.5 179,-117.5"/>
+<text text-anchor="start" x="223.5" y="-123.5" font-family="Times New Roman,serif" font-size="10.00">library:track event</text>
+<polygon fill="black" stroke="black" points="177,-134.5 177,-134.5 291,-134.5 291,-134.5 177,-134.5"/>
+<polygon fill="black" stroke="black" points="291,-134.5 291,-134.5 343,-134.5 343,-134.5 291,-134.5"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="178,-117 178,-166 342,-166 342,-117 178,-117"/>
+</g>
+<!-- collector&#45;service -->
+<g id="node2" class="node">
+<title>collector&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="8,-12.5 8,-63.5 216,-63.5 216,-12.5 8,-12.5"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="10,-31 10,-61 164,-61 164,-31 10,-31"/>
+<text text-anchor="start" x="13" y="-42.3" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">COLLECTOR&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="164,-31 164,-61 214,-61 214,-31 164,-31"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="176.953" y="-58"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="10,-14 10,-31 214,-31 214,-14 10,-14"/>
+<text text-anchor="start" x="56" y="-20" font-family="Times New Roman,serif" font-size="10.00">api:Log user behavior event</text>
+<polygon fill="black" stroke="black" points="8,-31 8,-31 164,-31 164,-31 8,-31"/>
+<polygon fill="black" stroke="black" points="164,-31 164,-31 216,-31 216,-31 164,-31"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="9,-13.5 9,-62.5 215,-62.5 215,-13.5 9,-13.5"/>
+</g>
+<!-- tracking&#45;sdk&#45;&gt;collector&#45;service -->
+<g id="edge1" class="edge">
+<title>tracking&#45;sdk:&#45;&gt;collector&#45;service:</title>
+<path fill="none" stroke="#333333" d="M218.38,-111.96C200.81,-99.91 180.2,-85.77 161.83,-73.17"/>
+<polygon fill="#333333" stroke="#333333" points="163.79,-70.27 153.56,-67.5 159.83,-76.05 163.79,-70.27"/>
+</g>
+<!-- tracking&#45;configuration&#45;service -->
+<g id="node3" class="node">
+<title>tracking&#45;configuration&#45;service</title>
+<polygon fill="#1b4e5e" stroke="transparent" points="250.5,-4 250.5,-72 567.5,-72 567.5,-4 250.5,-4"/>
+<polygon fill="#1b4e5e" stroke="transparent" points="253,-40 253,-70 516,-70 516,-40 253,-40"/>
+<text text-anchor="start" x="256" y="-51.3" font-family="Times New Roman,serif" font-size="14.00" fill="#fefefe">TRACKING&#45;CONFIGURATION&#45;SERVICE</text>
+<polygon fill="#1b4e5e" stroke="transparent" points="516,-40 516,-70 566,-70 566,-40 516,-40"/>
+<image xlink:href="templates/icons/python.png" width="24.0938px" height="24px" preserveAspectRatio="xMinYMin meet" x="528.953" y="-67"/>
+<polygon fill="#a3c7d4" stroke="transparent" points="253,-23 253,-40 566,-40 566,-23 253,-23"/>
+<text text-anchor="start" x="344.5" y="-29" font-family="Times New Roman,serif" font-size="10.00">api:create tracking configuration</text>
+<polygon fill="#a3c7d4" stroke="transparent" points="253,-6 253,-23 566,-23 566,-6 253,-6"/>
+<text text-anchor="start" x="350.5" y="-12" font-family="Times New Roman,serif" font-size="10.00">api:get tracking configuration</text>
+<polygon fill="black" stroke="black" points="251,-40 251,-40 516,-40 516,-40 251,-40"/>
+<polygon fill="black" stroke="black" points="516,-40 516,-40 568,-40 568,-40 516,-40"/>
+<polygon fill="black" stroke="black" points="251,-23 251,-23 568,-23 568,-23 251,-23"/>
+<polygon fill="none" stroke="black" stroke-width="2" points="251.5,-5 251.5,-71 566.5,-71 566.5,-5 251.5,-5"/>
+</g>
+<!-- tracking&#45;sdk&#45;&gt;tracking&#45;configuration&#45;service -->
+<g id="edge2" class="edge">
+<title>tracking&#45;sdk:&#45;&gt;tracking&#45;configuration&#45;service:</title>
+<path fill="none" stroke="#333333" d="M301.9,-111.96C315.57,-102.64 331.07,-92.09 345.94,-81.96"/>
+<polygon fill="#333333" stroke="#333333" points="348.31,-84.58 354.61,-76.05 344.37,-78.79 348.31,-84.58"/>
+</g>
+</g>
+</svg>
+
+       </div>
+        <h4 id="details-tracking-sdk-properties">Properties</h4>
+        <table>
+        
+        </table>
+
+        <h4 id="details-tracking-sdk-services">Components provided</h4>
+              <p>The application provides the following service components:</p>
+              <ul>
+                  
+                       <li>
+                        <b>track event </b>
+                        <br> 
+                       </li>
+                  
+              </ul>
+       <h4 id="details-tracking-sdk-dependencies">dependencies</h4>
+       <p>The application requires the following services:</p>
+       <ul>
+           
+           
+                <li>collector-service</li>
+           
+                <li>tracking-configuration-service</li>
+           
+       </ul>
+        <p>The application requires the following infrastructure services:</p>
+              <ul>
+                  
+              </ul>
+
+     </section>
+    
+</section>
+</body>
+</html>
