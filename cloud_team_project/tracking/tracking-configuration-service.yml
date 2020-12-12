@@ -1,0 +1,13 @@
+name: tracking-configuration-service
+description: Tracking Configuration Service
+team: Cloud Team Warsaw
+technology: python
+properties:
+  deployment: aws
+provided-services:
+- name: create tracking configuration
+  type: api
+- name: get tracking configuration
+  type: api
+infrastructure-dependencies:
+  - type: DynamoDB

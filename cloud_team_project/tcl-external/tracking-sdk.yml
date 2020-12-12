@@ -1,0 +1,12 @@
+name: tracking-sdk
+description: Tracking SDK installed on applications (Android, iOS, wechat miniprogram, ...)
+team: Eagle Lab Frontend Team
+category: external
+provided-services:
+- name: track event
+  type: library
+dependencies:
+- reference: collector-service
+    #description: send user behavior data
+- reference: tracking-configuration-service
+    #description: get tracking configuration

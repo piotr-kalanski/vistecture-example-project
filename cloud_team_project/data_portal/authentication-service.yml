@@ -1,0 +1,16 @@
+name: authentication-service
+description: Authentication Service for Data Portal responsible for generating JWT token
+team: Cloud Team Warsaw
+technology: python
+properties:
+  category: REST API
+  deployment: AWS
+  gitlab-url: https://gitlab.com/abc2
+provided-services:
+- name: authenticate
+  type: api
+infrastructure-dependencies:
+  - type: AWS API Gateway
+  - type: AWS Lambda
+dependencies:
+  - reference: oa-service

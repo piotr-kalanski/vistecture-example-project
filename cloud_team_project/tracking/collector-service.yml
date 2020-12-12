@@ -1,0 +1,13 @@
+name: collector-service
+description: Collector Service
+team: Cloud Team Warsaw
+technology: python
+properties:
+  deployment: aws
+provided-services:
+- name: Log user behavior event
+  type: api
+infrastructure-dependencies:
+  - type: DynamoDB
+dependencies:
+  - reference: tracking-configuration-service

@@ -1,0 +1,15 @@
+name: data-portal-frontend
+description: Data Portal Frontend
+team: Cloud Team Warsaw
+technology: react
+properties:
+  deployment: aws
+  gitlab-url: https://gitlab.com/blablabla
+provided-services:
+- name: Manage Data Ingestion
+  type: ui
+infrastructure-dependencies:
+  - type: S3
+dependencies:
+  - reference: tracking-configuration-service
+  - reference: authentication-service

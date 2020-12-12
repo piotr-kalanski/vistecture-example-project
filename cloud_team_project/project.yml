@@ -1,0 +1,25 @@
+---
+projectName: "Cloud Team Warsaw"
+appDefinitionsPaths:
+- tracking
+- data_portal
+- tcl-external
+# appOverrides:
+# - name: customer-portal
+#   add-provided-services:
+#   - name: loyalty
+#     type: gui
+#     dependencies:
+#     - reference: order-workflow
+subViews:
+  - name: "Tracking"
+    included-applications:
+      - collector-service
+      - tracking-configuration-service
+      - tracking-sdk
+  - name: "Data Portal"
+    included-applications:
+      - data-portal-frontend
+      - authentication-service
+      - oa-service
+      - tracking-configuration-service

@@ -1,0 +1,8 @@
+name: oa-service
+description: API to authenticate TCL employees with using credentials
+team: TCL
+# technology: python
+category: external
+provided-services:
+- name: authenticate
+  type: api
